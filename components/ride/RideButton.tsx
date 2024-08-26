@@ -1,4 +1,3 @@
-import { useRouter } from "expo-router";
 import React from "react";
 import { Alert, Dimensions, Pressable, Text } from "react-native";
 import { useSelector } from "react-redux";
@@ -18,7 +17,6 @@ type Props = {
 };
 
 const RideButton = ({ rideId, onStatusUpdate }: Props) => {
-  const router = useRouter();
   const acceptedStatuses = ["accepted", "picked-up"] as const;
 
   const ride = useSelector((state: RootState) =>
