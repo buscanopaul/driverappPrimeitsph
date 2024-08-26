@@ -102,7 +102,7 @@ const RideDetails = (props: Props) => {
           </Text>
         </View>
         <Text className="text-white">
-          {ride.status === "pending"
+          {ride.status !== "dropped-off"
             ? duration
             : useFormattedTime(ride.timeArrived)}
         </Text>

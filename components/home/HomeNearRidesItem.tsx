@@ -32,7 +32,7 @@ const HomeNearRidesItem = ({ ride }: Props) => {
       onPress={handleRide}
       className="bg-white p-3 rounded-md active:opacity-70"
     >
-      {ride.status === "dropped-off" && (
+      {ride.status !== "pending" && (
         <View className="flex-row items-center justify-between mb-4">
           <View
             style={{
@@ -43,7 +43,9 @@ const HomeNearRidesItem = ({ ride }: Props) => {
           >
             <Text className="text-white uppercase">{ride.status}</Text>
           </View>
-          <Text>{useFormattedTime(ride.timeArrived)}</Text>
+          {ride.status === "dropped-off" && (
+            <Text>{useFormattedTime(ride.timeArrived)}</Text>
+          )}
         </View>
       )}
       <View className="flex flex-row items-start gap-1 w-[90%]">
