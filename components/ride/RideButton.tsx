@@ -1,5 +1,6 @@
+import { useRouter } from "expo-router";
 import React from "react";
-import { Dimensions, Pressable, Text } from "react-native";
+import { Alert, Dimensions, Pressable, Text } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 
@@ -12,24 +13,40 @@ type RideStatus =
   | "picked-up";
 
 type Props = {
-  status: string;
   rideId: string;
   onStatusUpdate: (newStatus: RideStatus) => void;
 };
 
-const RideButton = ({ status, rideId, onStatusUpdate }: Props) => {
+const RideButton = ({ rideId, onStatusUpdate }: Props) => {
+  const router = useRouter();
+  const acceptedStatuses = ["accepted", "picked-up"] as const;
+
   const ride = useSelector((state: RootState) =>
     state.rides.rides.find((r) => r.id === rideId)
   );
 
+  const rides = useSelector((state: RootState) => state.rides.rides);
+
+  const hasAcceptedRide = rides.some((rideStatus) => {
+    return (
+      acceptedStatuses.includes(rideStatus.status.toLowerCase()) &&
+      rideStatus.id !== rideId
+    );
+  });
+
   const handleStatusUpdate = () => {
     if (!ride) return;
-    if (ride.status === "pending") {
-      onStatusUpdate("accepted");
-    } else if (ride.status === "accepted") {
-      onStatusUpdate("picked-up");
-    } else if (ride.status === "picked-up") {
-      onStatusUpdate("dropped-off");
+
+    if (!hasAcceptedRide) {
+      if (ride.status === "pending") {
+        onStatusUpdate("accepted");
+      } else if (ride.status === "accepted") {
+        onStatusUpdate("picked-up");
+      } else if (ride.status === "picked-up") {
+        onStatusUpdate("dropped-off");
+      }
+    } else {
+      Alert.alert("Error: You have in-progress ride.");
     }
   };
 

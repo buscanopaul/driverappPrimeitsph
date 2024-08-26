@@ -151,11 +151,7 @@ const RideDetails = (props: Props) => {
         </View>
         <View className="h-40" />
       </ScrollView>
-      <RideButton
-        status={ride.status}
-        rideId={ride.id}
-        onStatusUpdate={handleStatusUpdate}
-      />
+      <RideButton rideId={ride.id} onStatusUpdate={handleStatusUpdate} />
     </View>
   );
 };
