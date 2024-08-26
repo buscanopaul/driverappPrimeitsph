@@ -3,24 +3,30 @@ import { calculateDistance } from "@/utils/calculateDistance";
 import { AntDesign, Entypo, FontAwesome5 } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import {
-  Dimensions,
-  Image,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 
+import RideButton from "@/components/ride/RideButton";
 import RideMap from "@/components/ride/RideMap";
+import { updateRideStatus } from "@/features/rides/ridesSlice";
 import { useFormattedTime } from "@/utils/useFormattedTime";
 import * as Linking from "expo-linking";
+import { useDispatch } from "react-redux";
+
+type RideStatus =
+  | "pending"
+  | "dropped-off"
+  | "accepted"
+  | "declined"
+  | "started"
+  | "picked-up";
 
 type Props = {};
 
 const RideDetails = (props: Props) => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const [duration, setDuration] = useState("");
+  const [rideStatus, setRideStatus] = useState<RideStatus>("pending");
 
   const { rideData } = useLocalSearchParams<{
     id: string;
@@ -60,6 +66,11 @@ const RideDetails = (props: Props) => {
       fetchDuration();
     }
   }, [ride]);
+
+  const handleStatusUpdate = async (newStatus: RideStatus) => {
+    await dispatch(updateRideStatus({ id: ride.id, status: newStatus }));
+    setRideStatus(newStatus);
+  };
 
   return (
     <View className="flex-1 bg-white relative">
@@ -137,19 +148,11 @@ const RideDetails = (props: Props) => {
         </View>
         <View className="h-40" />
       </ScrollView>
-
-      <Pressable
-        style={{ width: Dimensions.get("window").width - 50 }}
-        className={`absolute bottom-10 mx-6 ${
-          ride.status === "pending"
-            ? "bg-green-300 active:opacity-70"
-            : "bg-gray-200"
-        }  p-4 rounded-full`}
-      >
-        <Text className="font-bold text-center">
-          {ride.status === "pending" ? "Let's get started!" : "Completed"}
-        </Text>
-      </Pressable>
+      <RideButton
+        status={ride.status}
+        rideId={ride.id}
+        onStatusUpdate={handleStatusUpdate}
+      />
     </View>
   );
 };
