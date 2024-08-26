@@ -1,70 +1,107 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import HomeHeader from "@/components/home/HomeHeader";
+import HomeNearRides from "@/components/home/HomeNearRides";
+import { calculateRegion } from "@/lib/map";
+import rides from "@/mocks/data/Rides";
+import * as Location from "expo-location";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { SafeAreaView, Text, View } from "react-native";
+import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
+import marker from "../../assets/icons/marker.png";
+import target from "../../assets/icons/target.png";
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const [hasPermission, setHasPermission] = useState(false);
+  const [userLocation, setUserLocation] =
+    useState<Location.LocationObject | null>(null);
+
+  useEffect(() => {
+    const requestLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        setHasPermission(false);
+        return;
+      }
+
+      setHasPermission(true);
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLocation(location);
+    };
+
+    requestLocation();
+  }, []);
+
+  const region = userLocation
+    ? calculateRegion({
+        userLatitude: userLocation.coords.latitude,
+        userLongitude: userLocation.coords.longitude,
+      })
+    : null;
+
+  if (!hasPermission) {
+    return (
+      <SafeAreaView className="mx-6 flex-1">
+        <Text className="text-white">Location permission not granted</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (!userLocation || !region) {
+    return (
+      <SafeAreaView className="mx-6 flex-1">
+        <Text className="text-white">Loading location...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  const handleRide = (ride) => {
+    router.push({
+      pathname: `/ride/${ride.ride_id}`,
+      params: { rideData: JSON.stringify(ride) },
+    });
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <SafeAreaView className="mx-6 flex-1">
+      <HomeHeader />
+      <View className="h-3" />
+      <MapView
+        provider={PROVIDER_DEFAULT}
+        className="w-full h-1/2"
+        tintColor="black"
+        mapType="mutedStandard"
+        showsPointsOfInterest={false}
+        showsUserLocation={true}
+        userInterfaceStyle="light"
+        initialRegion={region}
+      >
+        <Marker
+          coordinate={{
+            latitude: userLocation.coords.latitude,
+            longitude: userLocation.coords.longitude,
+          }}
+          title="current location"
+          image={target}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        {rides.map((ride) => (
+          <Marker
+            key={ride.id}
+            coordinate={{
+              latitude: ride.pickupLocation?.latitude,
+              longitude: ride.pickupLocation?.longitude,
+            }}
+            title={`Going to: ${ride.destinationAddress}`}
+            image={marker}
+            onPress={() => handleRide(ride)}
+          />
+        ))}
+      </MapView>
+      <View className="h-5" />
+      <Text className="text-white font-bold text-xl">Near Rides</Text>
+      <View className="h-3" />
+      <HomeNearRides />
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
