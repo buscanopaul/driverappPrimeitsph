@@ -5,7 +5,7 @@ import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import { useSelector } from "react-redux";
 import marker from "../../assets/icons/marker.png";
 import target from "../../assets/icons/target.png";
-import { RootState } from "../store";
+import { RootState } from "../../features/rides/store";
 
 type Props = {
   userLocation: any;

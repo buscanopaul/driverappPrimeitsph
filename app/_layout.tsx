@@ -9,7 +9,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
-import { store } from "@/components/store";
+import { store } from "@/features/rides/store";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Provider } from "react-redux";
 

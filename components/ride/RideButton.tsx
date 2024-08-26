@@ -1,7 +1,7 @@
 import React from "react";
 import { Alert, Dimensions, Pressable, Text } from "react-native";
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
+import { RootState } from "../../features/rides/store";
 
 type RideStatus =
   | "pending"

@@ -23,9 +23,18 @@ const ridesSlice = createSlice({
         ride.status = action.payload.status;
       }
     },
+    updateRideTimeArrived: (
+      state,
+      action: PayloadAction<{ id: string; timeArrived: string }>
+    ) => {
+      const ride = state.rides.find((r) => r.id === action.payload.id);
+      if (ride) {
+        ride.timeArrived = action.payload.timeArrived;
+      }
+    },
   },
 });
 
-export const { updateRideStatus } = ridesSlice.actions;
+export const { updateRideStatus, updateRideTimeArrived } = ridesSlice.actions;
 
 export default ridesSlice.reducer;

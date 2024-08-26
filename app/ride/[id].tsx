@@ -7,7 +7,10 @@ import { Image, Pressable, ScrollView, Text, View } from "react-native";
 
 import RideButton from "@/components/ride/RideButton";
 import RideMap from "@/components/ride/RideMap";
-import { updateRideStatus } from "@/features/rides/ridesSlice";
+import {
+  updateRideStatus,
+  updateRideTimeArrived,
+} from "@/features/rides/ridesSlice";
 import { useFormattedNumber } from "@/utils/useFormattedNumber";
 import { useFormattedTime } from "@/utils/useFormattedTime";
 import * as Linking from "expo-linking";
@@ -27,7 +30,6 @@ const RideDetails = (props: Props) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [duration, setDuration] = useState("");
-  const [rideStatus, setRideStatus] = useState<RideStatus>("pending");
 
   const { rideData } = useLocalSearchParams<{
     id: string;
@@ -70,7 +72,15 @@ const RideDetails = (props: Props) => {
 
   const handleStatusUpdate = async (newStatus: RideStatus) => {
     await dispatch(updateRideStatus({ id: ride.id, status: newStatus }));
-    setRideStatus(newStatus);
+
+    if (newStatus === "dropped-off") {
+      await dispatch(
+        updateRideTimeArrived({
+          id: ride.id,
+          timeArrived: new Date().toISOString(),
+        })
+      );
+    }
   };
 
   return (

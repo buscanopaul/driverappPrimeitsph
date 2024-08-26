@@ -1,8 +1,8 @@
 import React from "react";
 import { FlatList, View } from "react-native";
 import { useSelector } from "react-redux";
+import { RootState } from "../../features/rides/store";
 import HomeNearRidesItem from "../home/HomeNearRidesItem";
-import { RootState } from "../store";
 
 type Props = {};
 
