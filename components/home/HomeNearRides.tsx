@@ -1,11 +1,14 @@
-import rides from "@/mocks/data/Rides";
 import React from "react";
 import { FlatList, View } from "react-native";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 import HomeNearRidesItem from "./HomeNearRidesItem";
 
 type Props = {};
 
 const HomeNearRides = (props: Props) => {
+  const rides = useSelector((state: RootState) => state.rides.rides);
+
   return (
     <FlatList
       data={rides.filter((ride) => ride.status === "pending")}
