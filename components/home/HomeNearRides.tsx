@@ -8,13 +8,14 @@ type Props = {};
 
 const HomeNearRides = (props: Props) => {
   const rides = useSelector((state: RootState) => state.rides.rides);
-  const pendingRides = rides.reduce((ride) =>
-    ride.status === "pending" ? true : false
+
+  const hasPendingRide = useSelector((state: RootState) =>
+    state.rides.rides.some((ride) => ride.status === "pending")
   );
 
   return (
     <>
-      {rides && rides.length > 0 && pendingRides ? (
+      {rides && rides.length > 0 && hasPendingRide ? (
         <FlatList
           data={rides.filter((ride) => ride.status === "pending")}
           renderItem={(ride) => <HomeNearRidesItem ride={ride.item} />}

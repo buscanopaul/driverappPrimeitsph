@@ -1,5 +1,6 @@
 import { statusColors } from "@/constants/Colors";
 import { calculateDistance } from "@/utils/calculateDistance";
+import { useFormattedNumber } from "@/utils/useFormattedNumber";
 import { useFormattedTime } from "@/utils/useFormattedTime";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -70,7 +71,9 @@ const HomeNearRidesItem = ({ ride }: Props) => {
             {value} {unit}
           </Text>
         </View>
-        <Text className="font-bold text-lg">₱{ride.farePrice}</Text>
+        <Text className="font-bold text-lg">
+          ₱{useFormattedNumber(ride.farePrice)}
+        </Text>
       </View>
     </Pressable>
   );

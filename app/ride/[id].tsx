@@ -8,6 +8,7 @@ import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import RideButton from "@/components/ride/RideButton";
 import RideMap from "@/components/ride/RideMap";
 import { updateRideStatus } from "@/features/rides/ridesSlice";
+import { useFormattedNumber } from "@/utils/useFormattedNumber";
 import { useFormattedTime } from "@/utils/useFormattedTime";
 import * as Linking from "expo-linking";
 import { useDispatch } from "react-redux";
@@ -143,7 +144,9 @@ const RideDetails = (props: Props) => {
                 {value} {unit}
               </Text>
             </View>
-            <Text className="font-bold text-xl">₱{ride.farePrice}</Text>
+            <Text className="font-bold text-xl">
+              ₱{useFormattedNumber(ride.farePrice)}
+            </Text>
           </View>
         </View>
         <View className="h-40" />

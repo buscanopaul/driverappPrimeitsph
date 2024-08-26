@@ -44,6 +44,28 @@ const rides = [
     userName: "Princess Ico",
     userPhone: "+639270362958",
   },
+  {
+    id: "3",
+    userId: "4",
+    driverId: "2",
+    pickupLocation: {
+      latitude: 14.7515602,
+      longitude: 121.017763,
+    },
+    destination: {
+      latitude: 14.5139124,
+      longitude: 121.2329535,
+    },
+    status: "pending",
+    pickupTime: "2024-08-12 06:12:17.683046",
+    timestamp: "2024-08-12 06:12:17.683046",
+    timeArrived: "2024-08-12 06:20:17.683046",
+    originAddress: "SM Caloocan, Caloocan",
+    destinationAddress: "7-Eleven Tanay Sampaloc, Rizal",
+    farePrice: "2500.00",
+    userName: "Nenita Alob",
+    userPhone: "+639270362958",
+  },
 ];
 
 export default rides;
