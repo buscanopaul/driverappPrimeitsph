@@ -17,7 +17,7 @@ type Props = {
 };
 
 const RideButton = ({ rideId, onStatusUpdate }: Props) => {
-  const acceptedStatuses = ["accepted", "picked-up"] as const;
+  const acceptedStatuses: readonly RideStatus[] = ["accepted", "picked-up"];
 
   const ride = useSelector((state: RootState) =>
     state.rides.rides.find((r) => r.id === rideId)
@@ -36,15 +36,23 @@ const RideButton = ({ rideId, onStatusUpdate }: Props) => {
     if (!ride) return;
 
     if (!hasAcceptedRide) {
-      if (ride.status === "pending") {
-        onStatusUpdate("accepted");
-      } else if (ride.status === "accepted") {
-        onStatusUpdate("picked-up");
-      } else if (ride.status === "picked-up") {
-        onStatusUpdate("dropped-off");
-      }
+      const newStatus = getNextStatus(ride.status);
+      if (newStatus) onStatusUpdate(newStatus);
     } else {
-      Alert.alert("Error: You have in-progress ride.");
+      Alert.alert("Error", "You have an in-progress ride.");
+    }
+  };
+
+  const getNextStatus = (currentStatus: RideStatus): RideStatus | null => {
+    switch (currentStatus) {
+      case "pending":
+        return "accepted";
+      case "accepted":
+        return "picked-up";
+      case "picked-up":
+        return "dropped-off";
+      default:
+        return null;
     }
   };
 
@@ -56,6 +64,8 @@ const RideButton = ({ rideId, onStatusUpdate }: Props) => {
     return "Completed";
   };
 
+  const isButtonActive = ride && ride.status !== "dropped-off";
+
   return (
     <Pressable
       style={{ width: Dimensions.get("window").width - 50 }}
@@ -64,9 +74,7 @@ const RideButton = ({ rideId, onStatusUpdate }: Props) => {
           ? "bg-green-300 active:opacity-70"
           : "bg-gray-200"
       }  p-4 rounded-full`}
-      onPress={
-        ride && ride.status !== "dropped-off" ? handleStatusUpdate : null
-      }
+      onPress={isButtonActive ? handleStatusUpdate : undefined}
     >
       <Text className="font-bold text-center">{getStatusText()}</Text>
     </Pressable>

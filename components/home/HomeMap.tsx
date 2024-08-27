@@ -1,14 +1,13 @@
 import { calculateRegion } from "@/lib/map";
+import { LocationObject } from "expo-location";
 import { useRouter } from "expo-router";
 import React from "react";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import { useSelector } from "react-redux";
-import marker from "../../assets/icons/marker.png";
-import target from "../../assets/icons/target.png";
 import { RootState } from "../../features/rides/store";
 
 type Props = {
-  userLocation: any;
+  userLocation: LocationObject;
 };
 
 const HomeMap = ({ userLocation }: Props) => {
@@ -16,17 +15,15 @@ const HomeMap = ({ userLocation }: Props) => {
   const rides = useSelector((state: RootState) => state.rides.rides);
   const pendingRides = rides.filter((ride) => ride.status === "pending");
 
-  const region = userLocation
-    ? calculateRegion({
-        userLatitude: userLocation.coords.latitude,
-        userLongitude: userLocation.coords.longitude,
-      })
-    : null;
+  const region = calculateRegion({
+    userLatitude: userLocation.coords.latitude,
+    userLongitude: userLocation.coords.longitude,
+  });
 
   const handleRide = (ride) => {
     router.push({
-      pathname: `/ride/${ride.ride_id}`,
-      params: { rideData: JSON.stringify(ride) },
+      pathname: "/ride/[id]" as const,
+      params: { id: ride.id, rideData: JSON.stringify(ride) },
     });
   };
 
@@ -47,7 +44,7 @@ const HomeMap = ({ userLocation }: Props) => {
           longitude: userLocation.coords.longitude,
         }}
         title="current location"
-        image={target}
+        image={require("@/assets/icons/target.png")}
       />
       {pendingRides.map((ride) => (
         <Marker
@@ -57,7 +54,7 @@ const HomeMap = ({ userLocation }: Props) => {
             longitude: ride.pickupLocation?.longitude,
           }}
           title={`Going to: ${ride.destinationAddress}`}
-          image={marker}
+          image={require("@/assets/icons/marker.png")}
           onPress={() => handleRide(ride)}
         />
       ))}

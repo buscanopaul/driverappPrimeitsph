@@ -1,4 +1,5 @@
 import { statusColors } from "@/constants/Colors";
+import { Ride } from "@/types/Ride";
 import { calculateDistance } from "@/utils/calculateDistance";
 import { useFormattedNumber } from "@/utils/useFormattedNumber";
 import { useFormattedTime } from "@/utils/useFormattedTime";
@@ -7,23 +8,23 @@ import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 
 type Props = {
-  ride: any;
+  ride: Ride;
 };
 
 const HomeNearRidesItem = ({ ride }: Props) => {
   const router = useRouter();
 
   const { value, unit } = calculateDistance(
-    parseFloat(ride.pickupLocation.latitude),
-    parseFloat(ride.pickupLocation.longitude),
-    parseFloat(ride.destination.latitude),
-    parseFloat(ride.destination.longitude)
+    ride.pickupLocation.latitude,
+    ride.pickupLocation.longitude,
+    ride.destination.latitude,
+    ride.destination.longitude
   );
 
   const handleRide = () => {
     router.push({
-      pathname: `ride/${ride.ride_id}`,
-      params: { rideData: JSON.stringify(ride) },
+      pathname: "/ride/[id]" as const,
+      params: { id: ride.id, rideData: JSON.stringify(ride) },
     });
   };
 
@@ -50,7 +51,7 @@ const HomeNearRidesItem = ({ ride }: Props) => {
       )}
       <View className="flex flex-row items-start gap-1 w-[90%]">
         <Image
-          source={require("../../assets/icons/origin.png")}
+          source={require("@/assets/icons/origin.png")}
           className="h-5 w-5"
         />
         <Text className="">{ride.originAddress}</Text>

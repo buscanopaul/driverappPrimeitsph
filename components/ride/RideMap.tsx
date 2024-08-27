@@ -2,19 +2,27 @@ import { calculateRegion } from "@/lib/map";
 import React from "react";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
-import flag from "../../assets/icons/flag.png";
-import marker from "../../assets/icons/marker.png";
+
+type Location = {
+  latitude: number;
+  longitude: number;
+};
 
 type Props = {
-  ride: any;
+  ride: {
+    pickupLocation: Location;
+    destination: Location;
+    origin_address: string;
+    destination_address: string;
+  };
 };
 
 const RideMap = ({ ride }: Props) => {
   const region = calculateRegion({
-    userLatitude: parseFloat(ride.pickupLocation.latitude),
-    userLongitude: parseFloat(ride.pickupLocation.longitude),
-    destinationLatitude: parseFloat(ride.destination.latitude),
-    destinationLongitude: parseFloat(ride.destination.longitude),
+    userLatitude: ride.pickupLocation.latitude,
+    userLongitude: ride.pickupLocation.longitude,
+    destinationLatitude: ride.destination.latitude,
+    destinationLongitude: ride.destination.longitude,
   });
 
   return (
@@ -34,7 +42,7 @@ const RideMap = ({ ride }: Props) => {
           longitude: ride.pickupLocation.longitude,
         }}
         title={ride.origin_address}
-        image={marker}
+        image={require("@/assets/icons/marker.png")}
       />
       <Marker
         coordinate={{
@@ -42,7 +50,7 @@ const RideMap = ({ ride }: Props) => {
           longitude: ride.destination.longitude,
         }}
         title={ride.destination_address}
-        image={flag}
+        image={require("@/assets/icons/flag.png")}
       />
       <MapViewDirections
         origin={`${ride.pickupLocation.latitude},${ride.pickupLocation.longitude}`}

@@ -8,29 +8,26 @@ type Props = {};
 
 const HomeNearRides = (props: Props) => {
   const rides = useSelector((state: RootState) => state.rides.rides);
+  const pendingRides = rides.filter((ride) => ride.status === "pending");
 
-  const hasPendingRide = useSelector((state: RootState) =>
-    state.rides.rides.some((ride) => ride.status === "pending")
-  );
+  if (pendingRides.length === 0) {
+    return (
+      <View className="h-20 items-center justify-center">
+        <Text className="text-gray-500 font-bold text-lg">
+          No Available Rides
+        </Text>
+      </View>
+    );
+  }
 
   return (
-    <>
-      {rides && rides.length > 0 && hasPendingRide ? (
-        <FlatList
-          data={rides.filter((ride) => ride.status === "pending")}
-          renderItem={(ride) => <HomeNearRidesItem ride={ride.item} />}
-          keyExtractor={(ride) => ride.id}
-          ItemSeparatorComponent={() => <View className="h-5" />}
-          showsVerticalScrollIndicator={false}
-        />
-      ) : (
-        <View className="h-20 items-center justify-center">
-          <Text className="text-gray-500 font-bold text-lg">
-            No Available Rides
-          </Text>
-        </View>
-      )}
-    </>
+    <FlatList
+      data={pendingRides}
+      renderItem={({ item }) => <HomeNearRidesItem ride={item} />}
+      keyExtractor={(ride) => ride.id}
+      ItemSeparatorComponent={() => <View className="h-5" />}
+      showsVerticalScrollIndicator={false}
+    />
   );
 };
 
