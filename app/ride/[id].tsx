@@ -1,28 +1,33 @@
 import { calculateDriverTime } from "@/lib/map";
-import { calculateDistance } from "@/utils/calculateDistance";
 import { AntDesign, Entypo, FontAwesome5 } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
+import {
+  Alert,
+  Dimensions,
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
-import RideButton from "@/components/ride/RideButton";
 import RideMap from "@/components/ride/RideMap";
 import {
   updateRideStatus,
   updateRideTimeArrived,
 } from "@/features/rides/ridesSlice";
+import { RootState } from "@/features/rides/store";
+import { calculateDistance } from "@/utils/calculateDistance";
 import { useFormattedNumber } from "@/utils/useFormattedNumber";
 import { useFormattedTime } from "@/utils/useFormattedTime";
 import * as Linking from "expo-linking";
-import { useDispatch } from "react-redux";
-
-type RideStatus =
-  | "pending"
-  | "dropped-off"
-  | "accepted"
-  | "declined"
-  | "started"
-  | "picked-up";
+import { useDispatch, useSelector } from "react-redux";
 
 type Props = {};
 
@@ -31,23 +36,23 @@ const RideDetails = (props: Props) => {
   const navigation = useNavigation();
   const [duration, setDuration] = useState("");
 
-  const { rideData } = useLocalSearchParams<{
-    id: string;
-    rideData: string;
-  }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
 
-  const ride = rideData ? JSON.parse(rideData) : null;
+  const ride = useSelector((state: RootState) =>
+    state.rides.rides.find((r) => r.id === id)
+  );
+  const rides = useSelector((state: RootState) => state.rides.rides);
+
+  const { value, unit } = calculateDistance(
+    ride?.pickupLocation.latitude,
+    ride?.pickupLocation.longitude,
+    ride?.destination.latitude,
+    ride?.destination.longitude
+  );
 
   if (!ride) {
     return <Text>No ride data available</Text>;
   }
-
-  const { value, unit } = calculateDistance(
-    parseFloat(ride.pickupLocation.latitude),
-    parseFloat(ride.pickupLocation.longitude),
-    parseFloat(ride.destination.latitude),
-    parseFloat(ride.destination.longitude)
-  );
 
   const dialCall = () => {
     Linking.openURL(`sms:${ride.userPhone}`);
@@ -70,17 +75,63 @@ const RideDetails = (props: Props) => {
     }
   }, [ride]);
 
-  const handleStatusUpdate = async (newStatus: RideStatus) => {
-    await dispatch(updateRideStatus({ id: ride.id, status: newStatus }));
+  const hasInProgressRide = rides.some(
+    (r) =>
+      (r.status === "accepted" || r.status === "picked-up") && r.id !== ride.id
+  );
 
-    if (newStatus === "dropped-off") {
-      await dispatch(
+  const handleStatusUpdate = useCallback(() => {
+    if (hasInProgressRide) {
+      Alert.alert("Error", "You have an in-progress ride.");
+      return;
+    }
+    if (ride.status === "pending") {
+      dispatch(updateRideStatus({ id: ride.id, status: "accepted" }));
+    }
+
+    if (ride.status === "accepted") {
+      dispatch(updateRideStatus({ id: ride.id, status: "picked-up" }));
+    }
+
+    if (ride.status === "picked-up") {
+      dispatch(updateRideStatus({ id: ride.id, status: "dropped-offs" }));
+      dispatch(
         updateRideTimeArrived({
           id: ride.id,
           timeArrived: new Date().toISOString(),
         })
       );
     }
+  }, [ride, rides]);
+
+  if (!ride) {
+    return <Text>No ride data available</Text>;
+  }
+
+  const getButtonColor = () => {
+    if (!ride) return "bg-gray-200";
+    switch (ride.status) {
+      case "pending":
+        return "bg-green-300";
+      case "accepted":
+        return "bg-orange-200";
+      case "picked-up":
+        return "bg-blue-200";
+      case "dropped-off":
+        return "bg-gray-200";
+      case "dropped-offs":
+        return "bg-gray-200";
+      default:
+        return "bg-gray-200";
+    }
+  };
+
+  const getStatusText = () => {
+    if (!ride) return "No ride found";
+    if (ride.status === "pending") return "Let's get started!";
+    if (ride.status === "accepted") return "Pick up";
+    if (ride.status === "picked-up") return "Drop off";
+    return "Completed";
   };
 
   return (
@@ -96,7 +147,7 @@ const RideDetails = (props: Props) => {
         <View className="flex-row items-center gap-3">
           <FontAwesome5 name="directions" size={24} color="white" />
           <Text className="text-white">
-            {ride.status === "pending"
+            {ride.status !== "dropped-offs"
               ? "Estimated Travel Time"
               : "Time arrived"}
           </Text>
@@ -161,7 +212,13 @@ const RideDetails = (props: Props) => {
         </View>
         <View className="h-40" />
       </ScrollView>
-      <RideButton rideId={ride.id} onStatusUpdate={handleStatusUpdate} />
+      <Pressable
+        style={{ width: Dimensions.get("window").width - 50 }}
+        className={`absolute bottom-10 mx-6 ${getButtonColor()}  p-4 rounded-full`}
+        onPress={handleStatusUpdate}
+      >
+        <Text className="font-bold text-center">{getStatusText()}</Text>
+      </Pressable>
     </View>
   );
 };

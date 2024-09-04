@@ -42,7 +42,9 @@ const HomeNearRidesItem = ({ ride }: Props) => {
             }}
             className="p-2 rounded-lg"
           >
-            <Text className="text-white uppercase">{ride.status}</Text>
+            <Text className="text-white uppercase">
+              {ride.status === "dropped-offs" ? "dropped off" : ride.status}
+            </Text>
           </View>
           {ride.status === "dropped-off" && (
             <Text>{useFormattedTime(ride.timeArrived)}</Text>

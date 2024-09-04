@@ -23,7 +23,7 @@ const rides = [
   },
   {
     id: "2",
-    userId: "3",
+    userId: "2",
     driverId: "2",
     pickupLocation: {
       latitude: 14.7480972,
@@ -46,7 +46,7 @@ const rides = [
   },
   {
     id: "3",
-    userId: "4",
+    userId: "3",
     driverId: "2",
     pickupLocation: {
       latitude: 14.7515602,
@@ -64,6 +64,28 @@ const rides = [
     destinationAddress: "7-Eleven Tanay Sampaloc, Rizal",
     farePrice: "2500.00",
     userName: "Nenita Alob",
+    userPhone: "+639270362958",
+  },
+  {
+    id: "4",
+    userId: "5",
+    driverId: "2",
+    pickupLocation: {
+      latitude: 14.7501707,
+      longitude: 121.0153121,
+    },
+    destination: {
+      latitude: 14.7686787,
+      longitude: 120.996108,
+    },
+    status: "pending",
+    pickupTime: "",
+    timestamp: "2024-08-26T06:12:17.683046",
+    timeArrived: "",
+    originAddress: "SM Caloocan Supermarket, Caloocan",
+    destinationAddress: "Forest Park Memorial, Caloocan",
+    farePrice: "1500.00",
+    userName: "Judith Ico",
     userPhone: "+639270362958",
   },
 ];

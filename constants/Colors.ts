@@ -31,4 +31,5 @@ export const statusColors = {
   started: "#2196F3",
   "picked-up": "#FF9800",
   "dropped-off": "#9C27B0",
+  "dropped-offs": "#9C27B0",
 };
