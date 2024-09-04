@@ -114,7 +114,7 @@ const RideDetails = (props: Props) => {
       case "pending":
         return "bg-green-300";
       case "accepted":
-        return "bg-orange-200";
+        return "bg-violet-200";
       case "picked-up":
         return "bg-blue-200";
       case "dropped-off":
