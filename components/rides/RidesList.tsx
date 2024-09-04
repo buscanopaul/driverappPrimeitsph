@@ -7,13 +7,13 @@ import HomeNearRidesItem from "../home/HomeNearRidesItem";
 type Props = {};
 
 const RidesList = (props: Props) => {
-  const rides = useSelector((state: RootState) =>
-    state.rides.rides.filter((ride) => ride.status !== "pending")
-  );
+  const rides = useSelector((state: RootState) => state.rides.rides);
+
+  const filteredRides = rides.filter((ride) => ride.status !== "pending");
 
   return (
     <FlatList
-      data={rides}
+      data={filteredRides}
       renderItem={(ride) => <HomeNearRidesItem ride={ride.item} />}
       keyExtractor={(ride) => ride.id}
       ItemSeparatorComponent={() => <View className="h-5" />}
